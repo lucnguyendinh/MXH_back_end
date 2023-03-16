@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 
+//User
 const usersInfoSchema = new mongoose.Schema(
     {
         fullName: {
@@ -64,6 +65,7 @@ const userSchema = new mongoose.Schema(
     },
 )
 
+//Status
 const statusSchema = new mongoose.Schema(
     {
         user: {
@@ -82,22 +84,19 @@ const statusSchema = new mongoose.Schema(
         },
         like: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Like',
+                type: String,
                 default: [],
             },
         ],
         share: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Share',
+                type: String,
                 default: [],
             },
         ],
         comment: [
             {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Comment',
+                type: String,
                 default: [],
             },
         ],
@@ -110,13 +109,12 @@ const statusSchema = new mongoose.Schema(
 const likeSchema = new mongoose.Schema(
     {
         status: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Status',
+            type: String,
             require: true,
         },
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'UserInfo',
+            ref: 'Userinfo',
             require: true,
         },
     },
@@ -127,26 +125,23 @@ const likeSchema = new mongoose.Schema(
 
 const shareSchema = new mongoose.Schema({
     status: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Status',
+        type: String,
         require: true,
     },
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'UserInfo',
+        type: String,
     },
 })
 
 const commentSchema = new mongoose.Schema(
     {
         status: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Status',
+            type: String,
             require: true,
         },
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'UserInfo',
+            ref: 'Userinfo',
             require: true,
         },
         content: {
@@ -158,11 +153,52 @@ const commentSchema = new mongoose.Schema(
     },
 )
 
+//mess
+const conversationSchema = new mongoose.Schema(
+    {
+        members: {
+            type: Array,
+        },
+    },
+    {
+        timestamps: true,
+    },
+)
+
+const messageSchema = new mongoose.Schema({
+    conversationId: {
+        type: String,
+    },
+    sender: {
+        type: String,
+    },
+    text: {
+        type: String,
+    },
+})
+
+//Token
+const tokenSchema = new mongoose.Schema({
+    user: {
+        type: String,
+        unique: true,
+    },
+    refreshTokens: [
+        {
+            type: String,
+            default: [],
+        },
+    ],
+})
+
 let UsersInfo = mongoose.model('Userinfo', usersInfoSchema)
 let User = mongoose.model('User', userSchema)
 let Status = mongoose.model('Status', statusSchema)
 let Share = mongoose.model('Share', shareSchema)
 let Like = mongoose.model('Like', likeSchema)
 let Comment = mongoose.model('Comment', commentSchema)
+let ConverSation = mongoose.model('ConverSation', conversationSchema)
+let Message = mongoose.model('Message', messageSchema)
+let Token = mongoose.model('Token', tokenSchema)
 
-module.exports = { UsersInfo, User, Status, Share, Like, Comment }
+module.exports = { UsersInfo, User, Status, Share, Like, Comment, ConverSation, Message, Token }

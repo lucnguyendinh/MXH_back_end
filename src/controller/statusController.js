@@ -34,7 +34,7 @@ const statusController = {
                 user: req.body.user,
             })
 
-            const like = await newLike.save()
+            const like = await (await newLike.save()).populate('user')
 
             const status = Status.findById(req.body.status)
             await status.updateOne({ $push: { like: like._id } })
@@ -65,7 +65,7 @@ const statusController = {
                 user: req.body.user,
                 content: req.body.content,
             })
-            const comment = await newComment.save()
+            const comment = await (await newComment.save()).populate('user')
             if (req.body.status) {
                 const status = Status.findById(req.body.status)
                 await status.updateOne({ $push: { comment: comment._id } })
@@ -79,30 +79,32 @@ const statusController = {
     //GET STATUS
     getStatus: async (req, res) => {
         try {
-            const status = await Status.find()
-                .populate('user')
-                .populate({
-                    path: 'like',
-                    populate: {
-                        path: 'user',
-                        model: 'Userinfo',
-                    },
-                })
-                .populate({
-                    path: 'comment',
-                    populate: {
-                        path: 'user',
-                        model: 'Userinfo',
-                    },
-                })
-                .populate({
-                    path: 'share',
-                    populate: {
-                        path: 'user',
-                        model: 'Userinfo',
-                    },
-                })
+            const status = await Status.find().populate('user')
             return res.status(200).json(status)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+    getLike: async (req, res) => {
+        try {
+            const like = await Like.find({ status: req.params.id }).populate('user')
+            return res.status(200).json(like)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+    getComment: async (req, res) => {
+        try {
+            const comment = await Comment.find({ status: req.params.id }).populate('user')
+            return res.status(200).json(comment)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+    getShare: async (req, res) => {
+        try {
+            const share = await Share.find({ status: req.params.id }).populate('user')
+            return res.status(200).json(share)
         } catch (err) {
             return res.status(500).json(err)
         }
