@@ -1,4 +1,4 @@
-const { Status, Like, Share, Comment } = require('../models')
+const { Status, Like, Share, Comment, Notification } = require('../models')
 
 const statusController = {
     //UP STATUS
@@ -85,6 +85,17 @@ const statusController = {
             return res.status(500).json(err)
         }
     },
+
+    //GET STATUS BY ID
+    getStatusById: async (req, res) => {
+        try {
+            const status = await Status.find({ user: req.params.id }).populate('user')
+            return res.status(200).json(status)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+
     getLike: async (req, res) => {
         try {
             const like = await Like.find({ status: req.params.id }).populate('user')

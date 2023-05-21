@@ -1,11 +1,11 @@
 const express = require('express')
 const router = express.Router()
 
-const message = require('../controller/message')
+const messageController = require('../controller/messageController')
 
-router.post('/createconversation', message.createConverSation)
-router.get('/getmessage/:userId', message.getMessage)
-router.post('/mess', message.mess)
-router.get('/getmess/:conversationId', message.getMess)
+router.post('/createconversation', messageController.createConverSation)
+router.get('/getmessage/:userId', messageController.getMessage)
+router.post('/mess', messageController.mess)
+router.get('/getmess/:conversationId', messageController.getMess)
 
 module.exports = router

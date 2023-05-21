@@ -1,5 +1,6 @@
 const { ConverSation, Message } = require('../models')
-const message = {
+
+const messageController = {
     //[POST] converSation
     createConverSation: async (req, res) => {
         try {
@@ -48,4 +49,4 @@ const message = {
     },
 }
 
-module.exports = message
+module.exports = messageController

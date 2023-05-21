@@ -175,6 +175,15 @@ const authController = {
             return res.status(500).json(err)
         }
     },
+    //[GET] get all
+    getAll: async (req, res) => {
+        try {
+            const users = await UsersInfo.find()
+            return res.status(200).json(users)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
 }
 
 module.exports = authController

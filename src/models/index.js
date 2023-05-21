@@ -19,8 +19,21 @@ const usersInfoSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        avatarUrl: {
-            type: String,
+        avtImg: {
+            public_id: {
+                type: String,
+            },
+            url: {
+                type: String,
+            },
+        },
+        coverImg: {
+            public_id: {
+                type: String,
+            },
+            url: {
+                type: String,
+            },
         },
         idUser: {
             type: mongoose.Schema.Types.ObjectId,
@@ -177,6 +190,27 @@ const messageSchema = new mongoose.Schema({
     },
 })
 
+const notificationSchema = new mongoose.Schema({
+    idUser: {
+        type: String,
+    },
+    idOther: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Userinfo',
+    },
+    idStatus: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Status',
+    },
+    numberOther: {
+        type: Number,
+        default: 0,
+    },
+    content: {
+        type: String,
+    },
+})
+
 //Token
 const tokenSchema = new mongoose.Schema({
     user: {
@@ -199,6 +233,7 @@ let Like = mongoose.model('Like', likeSchema)
 let Comment = mongoose.model('Comment', commentSchema)
 let ConverSation = mongoose.model('ConverSation', conversationSchema)
 let Message = mongoose.model('Message', messageSchema)
+let Notification = mongoose.model('Notification', notificationSchema)
 let Token = mongoose.model('Token', tokenSchema)
 
-module.exports = { UsersInfo, User, Status, Share, Like, Comment, ConverSation, Message, Token }
+module.exports = { UsersInfo, User, Status, Share, Like, Comment, ConverSation, Message, Notification, Token }
