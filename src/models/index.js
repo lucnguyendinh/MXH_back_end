@@ -89,6 +89,10 @@ const statusSchema = new mongoose.Schema(
         content: {
             type: String,
         },
+        idStatus: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Status',
+        },
         img: {
             type: String,
         },
@@ -190,26 +194,33 @@ const messageSchema = new mongoose.Schema({
     },
 })
 
-const notificationSchema = new mongoose.Schema({
-    idUser: {
-        type: String,
+const notificationSchema = new mongoose.Schema(
+    {
+        idUser: {
+            type: String,
+        },
+        idOther: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Userinfo',
+            },
+        ],
+        idStatus: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Status',
+        },
+        count: {
+            type: Number,
+            default: 1,
+        },
+        action: {
+            type: Number,
+        },
     },
-    idOther: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Userinfo',
+    {
+        timestamps: true,
     },
-    idStatus: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Status',
-    },
-    numberOther: {
-        type: Number,
-        default: 0,
-    },
-    content: {
-        type: String,
-    },
-})
+)
 
 //Token
 const tokenSchema = new mongoose.Schema({
