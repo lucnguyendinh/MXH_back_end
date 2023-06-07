@@ -98,6 +98,24 @@ const statusController = {
             return res.status(500).json(err)
         }
     },
+    likeComment: async (req, res) => {
+        try {
+            const comment = await Comment.findById(req.body.id)
+            await comment.numberLike.updateOne({ count: comment.count.numberLike + 1, $push: { user: req.body.user } })
+            return res.status(200).json(comment)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+    unLikeComment: async (req, res) => {
+        try {
+            const comment = await Comment.findById(req.body.id)
+            await comment.numberLike.updateOne({ count: comment.count.numberLike - 1, $pull: { user: req.body.user } })
+            return res.status(200).json(comment)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
     share: async (req, res) => {
         try {
             const newStatus = new Status({

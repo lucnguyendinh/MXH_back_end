@@ -164,6 +164,18 @@ const commentSchema = new mongoose.Schema(
         content: {
             type: String,
         },
+        numberLike: {
+            user: [
+                {
+                    type: String,
+                    default: [],
+                },
+            ],
+            count: {
+                type: Number,
+                default: 0,
+            },
+        },
     },
     {
         timestamps: true,
