@@ -16,6 +16,5 @@ router.get('/getstatus/:iduser', statusController.getStatusByIdUser)
 router.get('/getstatusbyid/:id', statusController.getStatusById)
 router.get('/getlike/:id', statusController.getLike)
 router.get('/getcomment/:id', statusController.getComment)
-router.get('/getshare/:id', statusController.getShare)
 
 module.exports = router

@@ -70,6 +70,46 @@ const profileController = {
             return res.status(500).json(err)
         }
     },
+    following: async (req, res) => {
+        try {
+            const check = await UsersInfo.findOne({ _id: req.body.id, 'follow.followers': { $in: [req.body.user] } })
+            if (check) {
+                return res.status(400).json('ban da follow nguoi nay')
+            }
+            await UsersInfo.findByIdAndUpdate(req.body.id, {
+                $push: { 'follow.followers': req.body.user },
+            })
+            await UsersInfo.findByIdAndUpdate(req.body.user, {
+                $push: { 'follow.following': req.body.id },
+            })
+            const followers = await UsersInfo.findById(req.body.id)
+                .populate('follow.followers')
+                .populate('follow.following')
+            return res.status(200).json(followers)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+    unfollow: async (req, res) => {
+        try {
+            const check = await UsersInfo.findOne({ _id: req.body.id, 'follow.followers': { $in: [req.body.user] } })
+            if (!check) {
+                return res.status(400).json('ban chua follow nguoi nay')
+            }
+            await UsersInfo.findByIdAndUpdate(req.body.id, {
+                $pull: { 'follow.followers': req.body.user },
+            })
+            await UsersInfo.findByIdAndUpdate(req.body.user, {
+                $pull: { 'follow.following': req.body.id },
+            })
+            const followers = await UsersInfo.findById(req.body.id)
+                .populate('follow.followers')
+                .populate('follow.following')
+            return res.status(200).json(followers)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
 }
 
 module.exports = profileController

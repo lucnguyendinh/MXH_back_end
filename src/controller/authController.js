@@ -169,7 +169,9 @@ const authController = {
         const userId = req.query.userId
         const fullName = req.query.fullName
         try {
-            const user = userId ? await UsersInfo.findById(userId) : await UsersInfo.findOne({ fullName: fullName })
+            const user = userId
+                ? await UsersInfo.findById(userId).populate('follow.followers').populate('follow.following')
+                : await UsersInfo.findOne({ fullName: fullName })
             return res.status(200).json(user)
         } catch (err) {
             return res.status(500).json(err)

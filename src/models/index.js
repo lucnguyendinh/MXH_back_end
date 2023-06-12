@@ -19,6 +19,24 @@ const usersInfoSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
+        follow: {
+            //người theo dõi mình
+            followers: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Userinfo',
+                    default: [],
+                },
+            ],
+            //người mình theo dõi
+            following: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'Userinfo',
+                    default: [],
+                },
+            ],
+        },
         avtImg: {
             public_id: {
                 type: String,
@@ -94,6 +112,9 @@ const statusSchema = new mongoose.Schema(
             ref: 'Status',
         },
         img: {
+            type: String,
+        },
+        video: {
             type: String,
         },
         shareW: {

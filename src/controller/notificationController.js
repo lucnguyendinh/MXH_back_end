@@ -12,7 +12,16 @@ const notificationController = {
 
     like: async (req, res) => {
         try {
+            const check = await Notification.findOne({
+                idStatus: req.body.idStatus,
+                action: 1,
+                idOther: { $in: [req.body.idOther] },
+            })
             const status = await Notification.findOne({ idStatus: req.body.idStatus, action: 1 })
+
+            if (check) {
+                return res.status(400).json('Ban da like bai nay r...')
+            }
             //neu k co ai like
             if (!status) {
                 const likeNotifi = new Notification({
@@ -79,7 +88,14 @@ const notificationController = {
     },
     unLike: async (req, res) => {
         try {
-            const status = await Notification.findOne({ idStatus: req.body.idStatus, action: 1 })
+            const status = await Notification.findOne({
+                idStatus: req.body.idStatus,
+                action: 1,
+                idOther: { $in: [req.params.idOther] },
+            })
+            if (!status) {
+                return res.status(400).json('Ban chua like bai viet nay...')
+            }
             await status.updateOne({
                 $pull: { idOther: req.body.idOther },
                 count: status.count - 1,
