@@ -252,7 +252,16 @@ const statusController = {
 
     getStatusById: async (req, res) => {
         try {
-            const status = await Status.findById(req.params.id).populate('user')
+            const status = await Status.findById(req.params.id)
+                .populate('user')
+                .populate({
+                    path: 'idStatus',
+                    select: 'content img user shareW img video createdAt',
+                    populate: {
+                        path: 'user',
+                        select: 'avtImg fullName',
+                    },
+                })
             return res.status(200).json(status)
         } catch (err) {
             return res.status(500).json(err)

@@ -4,6 +4,12 @@ const messageController = {
     //[POST] converSation
     createConverSation: async (req, res) => {
         try {
+            const check = await ConverSation.findOne({
+                members: { $in: [req.body.receiverId] },
+            })
+            if (check) {
+                return res.status(200).json('ban da tao tin nhan roi...')
+            }
             const newConverSation = new ConverSation({
                 members: [req.body.senderId, req.body.receiverId],
             })
@@ -18,7 +24,7 @@ const messageController = {
         try {
             const message = await ConverSation.find({
                 members: { $in: [req.params.userId] },
-            })
+            }).sort({ updatedAt: -1 })
             return res.status(200).json(message)
         } catch (err) {
             return res.status(500).json(err)
@@ -33,6 +39,9 @@ const messageController = {
                 text: req.body.text,
             })
             const message = await newMessage.save()
+            const test = await ConverSation.findByIdAndUpdate(req.body.conversationId, {
+                updatedAt: new Date(),
+            })
             return res.status(200).json(message)
         } catch (err) {
             return res.status(500).json(err)
