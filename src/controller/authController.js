@@ -51,7 +51,7 @@ const authController = {
                 admin: user.admin,
             },
             process.env.JWT_ACCESS_KEY,
-            { expiresIn: '20s' },
+            { expiresIn: '60s' },
         )
     },
 
@@ -98,20 +98,13 @@ const authController = {
                     //Save to db
                     await newToken.save()
                 }
-                res.cookie('refreshToken', refreshToken, {
-                    httpOnly: true,
-                    maxAge: 31536000,
-                    secure: false, //deloy doi thanh true
-                    path: '/',
-                    sameSite: 'strict',
-                })
                 const userInfo = await UsersInfo.findOne({
                     idUser: user._id,
                 }).populate('idUser', 'sdt email admin')
                 if (!userInfo) {
-                    return res.status(200).json({ user, accessToken })
+                    return res.status(200).json({ user, accessToken, refreshToken })
                 }
-                return res.status(200).json({ userInfo, accessToken })
+                return res.status(200).json({ userInfo, accessToken, refreshToken })
             }
         } catch (err) {
             return res.status(500).json(err)
@@ -119,22 +112,22 @@ const authController = {
     },
 
     requestRefreshToken: async (req, res) => {
-        const refreshToken = req.cookies.refreshToken
-        if (!refreshToken) {
+        const refreshTokenExtra = req.body.refreshToken
+        if (!refreshTokenExtra) {
             return res.status(401).json("You're not authenticated!")
         }
         const token = await Token.findOne({ user: req.body.user })
 
-        if (!token.refreshTokens.includes(refreshToken)) {
+        if (!token.refreshTokens.includes(refreshTokenExtra)) {
             return res.status(403).json('Refresh token is not valid')
         }
 
-        jwt.verify(refreshToken, process.env.JWT_REFRESH_KEY, async (err, user) => {
+        jwt.verify(refreshTokenExtra, process.env.JWT_REFRESH_KEY, async (err, user) => {
             if (err) {
                 return res.status(400).json(err)
             }
             await token.updateOne({
-                $pull: { refreshTokens: refreshToken },
+                $pull: { refreshTokens: refreshTokenExtra },
             })
             const newAccessToken = authController.generateAccessToken(user)
             const newRefreshToken = authController.generateRefreshToken(user)
@@ -142,14 +135,7 @@ const authController = {
             await token.updateOne({
                 $push: { refreshTokens: newRefreshToken },
             })
-            res.cookie('refreshToken', newRefreshToken, {
-                httpOnly: true,
-                maxAge: 31536000,
-                secure: false, //deloy doi thanh true
-                path: '/',
-                sameSite: 'strict',
-            })
-            return res.status(200).json({ accessToken: newAccessToken })
+            return res.status(200).json({ accessToken: newAccessToken, refreshToken: newRefreshToken })
         })
     },
 

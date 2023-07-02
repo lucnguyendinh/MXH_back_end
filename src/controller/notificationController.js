@@ -22,7 +22,7 @@ const notificationController = {
             const status = await Notification.findOne({ idStatus: req.body.idStatus, action: 1 })
 
             if (check) {
-                return res.status(400).json('Ban da like bai nay r...')
+                return res.status(400).json('notification: Ban da like bai nay r...')
             }
             //neu k co ai like
             if (!status) {
@@ -33,13 +33,34 @@ const notificationController = {
                     action: 1,
                 })
                 await likeNotifi.save()
-                return res.status(200).json('done')
+                return res.status(200).json('notification: like')
             }
             await status.updateOne({
                 $push: { idOther: req.body.idOther },
                 count: status.count + 1,
             })
-            return res.status(200).json('done')
+            return res.status(200).json('notification: like')
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+    unLike: async (req, res) => {
+        try {
+            const status = await Notification.findOne({
+                idStatus: req.body.idStatus,
+                action: 1,
+                idOther: { $in: [req.body.idOther] },
+            })
+
+            if (!status) {
+                return res.status(400).json('notification: Ban chua like bai viet nay...')
+            }
+            await status.updateOne({
+                $pull: { idOther: req.body.idOther },
+                count: status.count - 1,
+            })
+
+            return res.status(200).json('notification: Da xoa')
         } catch (err) {
             return res.status(500).json(err)
         }
@@ -55,13 +76,13 @@ const notificationController = {
                     action: 2,
                 })
                 await commentNotifi.save()
-                return res.status(200).json('done')
+                return res.status(200).json('notification: comment')
             }
             await status.updateOne({
                 $push: { idOther: req.body.idOther },
                 count: status.count + 1,
             })
-            return res.status(200).json('done')
+            return res.status(200).json('notification: comment')
         } catch (err) {
             return res.status(500).json(err)
         }
@@ -77,37 +98,18 @@ const notificationController = {
                     action: 3,
                 })
                 await shareNotifi.save()
-                return res.status(200).json('done')
+                return res.status(200).json('notification: share')
             }
             await status.updateOne({
                 $push: { idOther: req.body.idOther },
                 count: status.count + 1,
             })
-            return res.status(200).json('done')
+            return res.status(200).json('notification: share')
         } catch (err) {
             return res.status(500).json(err)
         }
     },
-    unLike: async (req, res) => {
-        try {
-            const status = await Notification.findOne({
-                idStatus: req.body.idStatus,
-                action: 1,
-                idOther: { $in: [req.params.idOther] },
-            })
-            if (!status) {
-                return res.status(400).json('Ban chua like bai viet nay...')
-            }
-            await status.updateOne({
-                $pull: { idOther: req.body.idOther },
-                count: status.count - 1,
-            })
 
-            return res.status(200).json('Da xoa')
-        } catch (err) {
-            return res.status(500).json(err)
-        }
-    },
     unComment: async (req, res) => {
         try {
             const status = await Notification.findOne({ idStatus: req.body.idStatus, action: 2 })
@@ -124,7 +126,7 @@ const notificationController = {
                     await status.updateOne({ $set: { idOther: array }, count: status.count - 1 })
                 }
             }
-            return res.status(200).json('Da xoa')
+            return res.status(200).json('notification: Da xoa')
         } catch (err) {
             return res.status(500).json(err)
         }
@@ -136,7 +138,7 @@ const notificationController = {
                 $pull: { idOther: req.body.idOther },
                 count: status.count - 1,
             })
-            return res.status(200).json('Da xoa')
+            return res.status(200).json('notification: Da xoa')
         } catch (err) {
             return res.status(500).json(err)
         }

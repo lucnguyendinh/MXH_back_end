@@ -268,6 +268,45 @@ const statusController = {
         }
     },
 
+    getVideo: async (req, res) => {
+        try {
+            const statusByVideo = await Status.find({ video: { $regex: '' } })
+                .sort({ createdAt: -1 })
+                .populate('user')
+                .populate({
+                    path: 'idStatus',
+                    select: 'content img user shareW createdAt',
+                    populate: {
+                        path: 'user',
+                        select: 'avtImg fullName',
+                    },
+                })
+            return res.status(200).json(statusByVideo)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+
+    getNewFeed: async (req, res) => {
+        try {
+            const newFeed = await Status.find()
+                .sort({ createdAt: -1 })
+                .limit(10)
+                .populate('user')
+                .populate({
+                    path: 'idStatus',
+                    select: 'content img user shareW createdAt',
+                    populate: {
+                        path: 'user',
+                        select: 'avtImg fullName',
+                    },
+                })
+            return res.status(200).json(newFeed)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+
     getLike: async (req, res) => {
         try {
             const like = await Like.find({ status: req.params.id }).populate('user')
