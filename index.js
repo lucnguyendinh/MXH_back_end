@@ -4,8 +4,8 @@ const dotenv = require('dotenv')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 
-const db = require('./config/db')
-const route = require('./routes')
+const db = require('./src/config/db')
+const route = require('./src/routes')
 
 const app = express()
 
