@@ -7,6 +7,14 @@ const authController = {
     //REGISTER
     registerUser: async (req, res) => {
         try {
+            const email = await User.findOne({ email: req.body.email })
+            const phoneNumber = await User.findOne({ sdt: req.body.sdt })
+            if (email) {
+                return res.status(404).json('Email này đã được sử dụng!')
+            }
+            if (phoneNumber) {
+                return res.status(404).json('Số điện thoại này đã được sử dụng!')
+            }
             const salt = await bcrypt.genSalt(10)
             const hashed = await bcrypt.hash(req.body.password, salt)
 
@@ -74,11 +82,11 @@ const authController = {
             const user = await User.findOne({ sdt: req.body.sdt })
 
             if (!user) {
-                return res.status(404).json('Wrong number phone!')
+                return res.status(404).json('Số điện thoại không đúng!')
             }
             const validPassword = await bcrypt.compare(req.body.password, user.password)
             if (!validPassword) {
-                return res.status(404).json('Wrong password!')
+                return res.status(404).json('Sai mật khẩu!')
             }
             if (user && validPassword) {
                 const accessToken = authController.generateAccessToken(user)
