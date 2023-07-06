@@ -5,10 +5,10 @@ const messageController = {
     createConverSation: async (req, res) => {
         try {
             const check = await ConverSation.findOne({
-                members: { $in: [req.body.receiverId, req.body.senderId] },
+                members: { $all: [req.body.receiverId, req.body.senderId] },
             })
             if (check) {
-                return res.status(200).json('ban da tao tin nhan roi...')
+                return res.status(200).json('ban da tao tin nhan roi...: ' + check)
             }
             const newConverSation = new ConverSation({
                 members: [req.body.senderId, req.body.receiverId],
