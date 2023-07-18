@@ -126,7 +126,7 @@ const authController = {
         }
         const token = await Token.findOne({ user: req.body.user })
 
-        if (!token.refreshTokens.includes(refreshTokenExtra)) {
+        if (!token?.refreshTokens.includes(refreshTokenExtra)) {
             return res.status(403).json('Refresh token is not valid')
         }
 
