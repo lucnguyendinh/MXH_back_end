@@ -4,7 +4,7 @@ const notificationController = {
     notification: async (req, res) => {
         try {
             const notifi = await Notification.find({ idUser: req.params.idUser })
-                .sort({ createdAt: -1 })
+                .sort({ updatedAt: -1 })
                 .populate('idOther')
             return res.status(200).json(notifi)
         } catch (err) {
