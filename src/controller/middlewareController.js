@@ -21,7 +21,7 @@ const middlewareController = {
     verifyTokenAndAdminAuth: (req, res, next) => {
         middlewareController.verifyToken(req, res, () => {
             if (req.user._id == req.params.id || req.user.admin) {
-                next()
+                next() 
             } else {
                 return res
                     .status(403)
@@ -29,6 +29,9 @@ const middlewareController = {
             }
         })
     },
+    verifyAccount: (req, res, next) => {
+        
+    }
 }
 
 module.exports = middlewareController

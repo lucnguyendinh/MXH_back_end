@@ -90,6 +90,13 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+        currentStatus: {
+            //1: hoat dong
+            //2: han che
+            //3: khoa
+            type: Number,
+            default: 1,
+        },
     },
     {
         timestamps: true,
@@ -269,6 +276,42 @@ const tokenSchema = new mongoose.Schema({
     ],
 })
 
+//Admin
+const historyAdminSchema = new mongoose.Schema(
+    {
+        idAdmin: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        idUser: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        },
+        //1: mo khoa tk, 2: khoa cmt, 3 khoa tk, 4 nang cap admin
+        status: {
+            type: Number,
+        },
+    },
+    {
+        timestamps: true,
+    },
+)
+
+const notificationAdminSchema = new mongoose.Schema({
+    idUser: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Userinfo',
+    },
+    idStatusReport: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Status',
+    },
+    idUserReport: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Userinfo',
+    },
+})
+
 let UsersInfo = mongoose.model('Userinfo', usersInfoSchema)
 let User = mongoose.model('User', userSchema)
 let Status = mongoose.model('Status', statusSchema)
@@ -279,5 +322,20 @@ let ConverSation = mongoose.model('ConverSation', conversationSchema)
 let Message = mongoose.model('Message', messageSchema)
 let Notification = mongoose.model('Notification', notificationSchema)
 let Token = mongoose.model('Token', tokenSchema)
+let HistoryAdmin = mongoose.model('History', historyAdminSchema)
+let NotificationAdmin = mongoose.model('NotificationAdmin', notificationAdminSchema)
 
-module.exports = { UsersInfo, User, Status, Share, Like, Comment, ConverSation, Message, Notification, Token }
+module.exports = {
+    UsersInfo,
+    User,
+    Status,
+    Share,
+    Like,
+    Comment,
+    ConverSation,
+    Message,
+    Notification,
+    Token,
+    HistoryAdmin,
+    NotificationAdmin,
+}

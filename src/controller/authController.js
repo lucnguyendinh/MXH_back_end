@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-const { User, UsersInfo, Token } = require('../models')
+const { User, UsersInfo, Token, NotificationAdmin, HistoryAdmin } = require('../models')
 
 const authController = {
     //REGISTER
@@ -89,6 +89,9 @@ const authController = {
                 return res.status(404).json('Sai mật khẩu!')
             }
             if (user && validPassword) {
+                if (user.currentStatus === 3) {
+                    return res.status(404).json('Tài khoản hiện đang bị khóa...')
+                }
                 const accessToken = authController.generateAccessToken(user)
                 const refreshToken = authController.generateRefreshToken(user)
 
