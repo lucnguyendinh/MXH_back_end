@@ -5,7 +5,7 @@ const statusController = require('../controller/statusController')
 const middlewareController = require('../controller/middlewareController')
 
 router.post('/upstatus', middlewareController.verifyToken, statusController.upStatus)
-router.post('/like', middlewareController.verifyToken, statusController.like)
+router.post('/like', middlewareController.verifyTokenAndAdminAuthActive, statusController.like)
 router.delete('/unlike/:id', middlewareController.verifyToken, statusController.unLike)
 router.post('/comment', middlewareController.verifyToken, statusController.comment)
 router.delete('/comment/:id', middlewareController.verifyToken, statusController.deleteComment)

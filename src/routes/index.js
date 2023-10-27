@@ -4,6 +4,7 @@ const messageRouter = require('./message')
 const profileRouter = require('./profile')
 const notificationRouter = require('./notification')
 const adminRouter = require('./admin')
+const reportRouter = require('./report')
 
 const route = (app) => {
     app.use('/auth', authRouter)
@@ -12,6 +13,7 @@ const route = (app) => {
     app.use('/profile', profileRouter)
     app.use('/notification', notificationRouter)
     app.use('/admin', adminRouter)
+    app.use('/admin/report', reportRouter)
 }
 
 module.exports = route

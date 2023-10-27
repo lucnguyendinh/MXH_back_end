@@ -57,6 +57,7 @@ const authController = {
             {
                 _id: user._id,
                 admin: user.admin,
+                currentStatus: user.currentStatus,
             },
             process.env.JWT_ACCESS_KEY,
             { expiresIn: '1d' },
@@ -69,6 +70,7 @@ const authController = {
             {
                 _id: user._id,
                 admin: user.admin,
+                currentStatus: user.currentStatus,
             },
             process.env.JWT_REFRESH_KEY,
             { expiresIn: '365d' },

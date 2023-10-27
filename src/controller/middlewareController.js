@@ -20,18 +20,26 @@ const middlewareController = {
 
     verifyTokenAndAdminAuth: (req, res, next) => {
         middlewareController.verifyToken(req, res, () => {
-            if (req.user._id == req.params.id || req.user.admin) {
-                next() 
+            if (req.user._id === req.body.id || req.user.admin) {
+                next()
             } else {
-                return res
-                    .status(403)
-                    .json("You're not a allowed to delete other")
+                return res.status(403).json('Không thể xác thực !!!')
             }
         })
     },
-    verifyAccount: (req, res, next) => {
-        
-    }
+    verifyTokenAndAdminAuthActive: (req, res, next) => {
+        middlewareController.verifyToken(req, res, () => {
+            if (req.user._id === req.body.id || req.user.admin) {
+                if (req.user.currentStatus === 2) {
+                    return res.status(403).json('Tài khoản đang bị hạn chế !!!')
+                } else {
+                    next() // Cho phép yêu cầu tiếp tục xử lý
+                }
+            } else {
+                return res.status(403).json('Không thể xác thực !!!')
+            }
+        })
+    },
 }
 
 module.exports = middlewareController

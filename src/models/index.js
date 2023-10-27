@@ -312,6 +312,29 @@ const notificationAdminSchema = new mongoose.Schema({
     },
 })
 
+const reportSchema = new mongoose.Schema(
+    {
+        option: {
+            //1: user
+            //2: status
+            //3: comment
+            type: Number,
+            required: true,
+        },
+        idRp: {
+            type: String,
+            required: true,
+        },
+        idU: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Userinfo',
+        },
+    },
+    {
+        timestamps: true,
+    },
+)
+
 let UsersInfo = mongoose.model('Userinfo', usersInfoSchema)
 let User = mongoose.model('User', userSchema)
 let Status = mongoose.model('Status', statusSchema)
@@ -324,6 +347,7 @@ let Notification = mongoose.model('Notification', notificationSchema)
 let Token = mongoose.model('Token', tokenSchema)
 let HistoryAdmin = mongoose.model('History', historyAdminSchema)
 let NotificationAdmin = mongoose.model('NotificationAdmin', notificationAdminSchema)
+let Report = mongoose.model('Report', reportSchema)
 
 module.exports = {
     UsersInfo,
@@ -338,4 +362,5 @@ module.exports = {
     Token,
     HistoryAdmin,
     NotificationAdmin,
+    Report,
 }

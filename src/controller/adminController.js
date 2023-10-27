@@ -1,4 +1,7 @@
-const { User, UsersInfo, NotificationAdmin, HistoryAdmin } = require('../models')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+
+const { User, UsersInfo, NotificationAdmin, HistoryAdmin, Token } = require('../models')
 
 const adminController = {
     getAllUser: async (req, res) => {
@@ -65,6 +68,20 @@ const adminController = {
             return res.status(500).json(err)
         }
     },
+    SearchById: async (req, res) => {
+        try {
+            const userId = req.query.id
+            // Kiểm tra xem userId có hợp lệ (là một ObjectId) hay không
+            if (/^[0-9a-fA-F]{24}$/.test(userId)) {
+                const user = await UsersInfo.find({ idUser: userId }).select('fullName avtImg.url idUser')
+                return res.status(200).json(user)
+            } else {
+                return res.status(200).json([])
+            }
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
     History: async (req, res) => {
         try {
             // Tính tổng số lượng bản ghi trong cơ sở dữ liệu
@@ -85,6 +102,78 @@ const adminController = {
                 .skip((page - 1) * resultsPerPage)
                 .limit(resultsPerPage)
             return res.status(200).json({ history, totalPages })
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+
+    //GENERATE ACCESS TOKEN
+    generateAccessToken: (user) => {
+        return jwt.sign(
+            {
+                _id: user._id,
+                admin: user.admin,
+                currentStatus: user.currentStatus,
+            },
+            process.env.JWT_ACCESS_KEY,
+            { expiresIn: '1d' },
+        )
+    },
+
+    //GENERATE REFRESH TOKEN
+    generateRefreshToken: (user) => {
+        return jwt.sign(
+            {
+                _id: user._id,
+                admin: user.admin,
+                currentStatus: user.currentStatus,
+            },
+            process.env.JWT_REFRESH_KEY,
+            { expiresIn: '365d' },
+        )
+    },
+
+    Login: async (req, res) => {
+        try {
+            const admin = await User.findOne({ sdt: req.body.phoneNumber })
+            const checkAdmin = admin?.admin
+
+            if (!admin || !checkAdmin) {
+                return res.status(404).json('Số điện thoại không đúng!')
+            }
+            const validPassword = await bcrypt.compare(req.body.password, admin.password)
+            if (!validPassword) {
+                return res.status(404).json('Sai mật khẩu!')
+            }
+            if (admin && validPassword) {
+                if (admin.currentStatus === 3) {
+                    return res.status(404).json('Tài khoản hiện đang bị khóa...')
+                }
+                const accessToken = adminController.generateAccessToken(admin)
+                const refreshToken = adminController.generateRefreshToken(admin)
+
+                const token = await Token.findOneAndUpdate(
+                    { user: admin._id },
+                    {
+                        $push: { refreshTokens: refreshToken },
+                    },
+                )
+                if (!token) {
+                    const newToken = new Token({
+                        refreshTokens: refreshToken,
+                        user: admin._id,
+                    })
+                    //Save to db
+                    await newToken.save()
+                }
+                const userInfo = await UsersInfo.findOne({
+                    idUser: admin._id,
+                }).populate('idUser', 'sdt email admin')
+                if (!userInfo) {
+                    return res.status(200).json({ admin, accessToken, refreshToken })
+                }
+                return res.status(200).json({ userInfo, accessToken, refreshToken })
+            }
         } catch (err) {
             return res.status(500).json(err)
         }
