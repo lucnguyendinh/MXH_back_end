@@ -80,6 +80,12 @@ const userSchema = new mongoose.Schema(
             minlength: 6,
             maxlength: 20,
             unique: true,
+            validate: {
+                validator: function (v) {
+                    return /\S+@\S+\.\S+/.test(v)
+                },
+                message: (props) => `${props.value} is not a valid email address!`,
+            },
         },
         password: {
             type: String,
@@ -103,6 +109,23 @@ const userSchema = new mongoose.Schema(
     },
 )
 
+const albumSchema = new mongoose.Schema(
+    {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Userinfo',
+            require: true,
+        },
+        name: {
+            type: String,
+            require: true,
+        },
+    },
+    {
+        timestamps: true,
+    },
+)
+
 //Status
 const statusSchema = new mongoose.Schema(
     {
@@ -115,6 +138,10 @@ const statusSchema = new mongoose.Schema(
             type: String,
         },
         idStatus: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Status',
+        },
+        album: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Status',
         },
@@ -348,6 +375,7 @@ let Token = mongoose.model('Token', tokenSchema)
 let HistoryAdmin = mongoose.model('History', historyAdminSchema)
 let NotificationAdmin = mongoose.model('NotificationAdmin', notificationAdminSchema)
 let Report = mongoose.model('Report', reportSchema)
+let Album = mongoose.model('Album', albumSchema)
 
 module.exports = {
     UsersInfo,
@@ -363,4 +391,5 @@ module.exports = {
     HistoryAdmin,
     NotificationAdmin,
     Report,
+    Album,
 }

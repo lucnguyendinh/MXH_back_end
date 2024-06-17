@@ -1,7 +1,52 @@
-const { Status, Like, Share, Comment } = require('../models')
+const { get, default: mongoose } = require('mongoose')
+const { Status, Like, Comment, Album } = require('../models')
 const cloudinary = require('../utils/cloudinary')
 
 const statusController = {
+    getAlbum: async (req, res) => {
+        try {
+            const album = await Album.find({ user: req.params.id })
+            return res.status(200).json(album)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+    addAlbum: async (req, res) => {
+        try {
+            const newAlbum = new Album({
+                user: req.body.user,
+                name: req.body.name,
+            })
+            const album = await newAlbum.save()
+            return res.status(200).json(album)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
+    getStatusByAlbum: async (req, res) => {
+        try {
+            const idUser = req.query.idUser
+            const listUser = req.query.listUser ? [...req.query.listUser, idUser] : [idUser]
+
+            const status = await Status.find({
+                album: req.params.id,
+                $or: [{ shareW: 1 }, { shareW: 2, user: { $in: listUser } }, { shareW: 3, user: idUser }],
+            })
+                .sort({ createdAt: -1 })
+                .populate('user')
+                .populate({
+                    path: 'idStatus',
+                    select: 'content img user shareW createdAt',
+                    populate: {
+                        path: 'user',
+                        select: 'avtImg fullName',
+                    },
+                })
+            return res.status(200).json(status)
+        } catch (err) {
+            return res.status(500).json(err)
+        }
+    },
     //UP STATUS
     upStatus: async (req, res) => {
         try {
@@ -19,6 +64,7 @@ const statusController = {
                         content: req.body.content,
                         img: result.secure_url,
                         shareW: req.body.shareW,
+                        album: req.body.album,
                     })
                 } else if (media.startsWith('data:video/')) {
                     result = await cloudinary.uploader.upload(media, {
@@ -30,6 +76,7 @@ const statusController = {
                         content: req.body.content,
                         video: result.secure_url,
                         shareW: req.body.shareW,
+                        album: req.body.album,
                     })
                 }
             } else {
@@ -37,6 +84,7 @@ const statusController = {
                     user: req.body.user,
                     content: req.body.content,
                     shareW: req.body.shareW,
+                    album: req.body.album,
                 })
             }
 
@@ -168,9 +216,25 @@ const statusController = {
     //GET STATUS
     getStatus: async (req, res) => {
         try {
+            const listUser = req.query.listUser || []
             const status = await Status.aggregate([
                 {
                     $sample: { size: 8 },
+                },
+                {
+                    $match: {
+                        $and: [
+                            { shareW: { $ne: 3 } },
+                            {
+                                $or: [
+                                    { shareW: { $ne: 2 } },
+                                    {
+                                        $and: [{ shareW: 2 }, { user: { $in: listUser } }],
+                                    },
+                                ],
+                            },
+                        ],
+                    },
                 },
                 {
                     $lookup: {
@@ -215,15 +279,6 @@ const statusController = {
                     },
                 },
             ])
-            // const status = await Status.find()
-            //     .populate('user')
-            // .populate({
-            //     path: 'idStatus',
-            //     select: 'content img user shareW createdAt',
-            //     populate: {
-            //         path: 'user',
-            //     },
-            // })
             return res.status(200).json(status)
         } catch (err) {
             return res.status(500).json(err)
@@ -233,7 +288,13 @@ const statusController = {
     //GET STATUS BY ID
     getStatusByIdUser: async (req, res) => {
         try {
-            const status = await Status.find({ user: req.params.iduser })
+            const idUser = req.query.idUser
+            const listUser = req.query.listUser ? [...req.query.listUser, idUser] : [idUser]
+
+            const status = await Status.find({
+                user: req.params.iduser,
+                $or: [{ shareW: 1 }, { shareW: 2, user: { $in: listUser } }, { shareW: 3, user: idUser }],
+            })
                 .sort({ createdAt: -1 })
                 .populate('user')
                 .populate({
@@ -270,7 +331,13 @@ const statusController = {
 
     getVideo: async (req, res) => {
         try {
-            const statusByVideo = await Status.find({ video: { $regex: '' } })
+            const idUser = req.query.idUser
+            const listUser = req.query.listUser ? [...req.query.listUser, idUser] : [idUser]
+
+            const statusByVideo = await Status.find({
+                video: { $regex: '' },
+                $or: [{ shareW: 1 }, { shareW: 2, user: { $in: listUser } }, { shareW: 3, user: idUser }],
+            })
                 .sort({ createdAt: -1 })
                 .populate('user')
                 .populate({
@@ -289,7 +356,11 @@ const statusController = {
 
     getNewFeed: async (req, res) => {
         try {
-            const newFeed = await Status.find()
+            const idUser = req.query.idUser
+            const listUser = req.query.listUser ? [...req.query.listUser, idUser] : [idUser]
+            const newFeed = await Status.find({
+                $or: [{ shareW: 1 }, { shareW: 2, user: { $in: listUser } }, { shareW: 3, user: idUser }],
+            })
                 .sort({ createdAt: -1 })
                 .limit(10)
                 .populate('user')

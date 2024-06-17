@@ -4,6 +4,10 @@ const router = express.Router()
 const statusController = require('../controller/statusController')
 const middlewareController = require('../controller/middlewareController')
 
+router.post('/addAlbum', middlewareController.verifyToken, statusController.addAlbum)
+router.get('/getAlbum/:id', middlewareController.verifyToken, statusController.getAlbum)
+
+router.get('/getStatusByAlbum/:id', middlewareController.verifyToken, statusController.getStatusByAlbum)
 router.post('/upstatus', middlewareController.verifyToken, statusController.upStatus)
 router.post('/like', middlewareController.verifyTokenAndAdminAuthActive, statusController.like)
 router.delete('/unlike/:id', middlewareController.verifyToken, statusController.unLike)
