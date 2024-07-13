@@ -25,7 +25,7 @@ const sendMailController = {
 
         let mailOptions = {
             from: 'lucnguyendinh202@gmail.com',
-            to: 'lucsoaica754@gmail.com',
+            to: 'ngottha110@gmail.com',
             subject: 'Gửi công chúa của anhhhh!!!',
             html: `<link rel="preconnect" href="https://fonts.googleapis.com">
               <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
