@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 
 const adminController = require('../controller/adminController')
-const middlewareController = require('../controller/middlewareController')
 
 router.get('/getalluser', adminController.getAllUser)
 router.post('/editeserrights', adminController.editEserRights)
