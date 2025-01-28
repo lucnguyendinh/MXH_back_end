@@ -362,6 +362,27 @@ const reportSchema = new mongoose.Schema(
     },
 )
 
+const lixiSchema = new mongoose.Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+        },
+        price: {
+            type: Number,
+            required: true,
+        },
+        text: {
+            type: String,
+            required: true,
+        }
+
+    },
+    {
+        timestamps: true,
+    },
+)
+
 let UsersInfo = mongoose.model('Userinfo', usersInfoSchema)
 let User = mongoose.model('User', userSchema)
 let Status = mongoose.model('Status', statusSchema)
@@ -376,6 +397,7 @@ let HistoryAdmin = mongoose.model('History', historyAdminSchema)
 let NotificationAdmin = mongoose.model('NotificationAdmin', notificationAdminSchema)
 let Report = mongoose.model('Report', reportSchema)
 let Album = mongoose.model('Album', albumSchema)
+let Lixi = mongoose.model('Lixi', lixiSchema)
 
 module.exports = {
     UsersInfo,
@@ -392,4 +414,5 @@ module.exports = {
     NotificationAdmin,
     Report,
     Album,
+    Lixi
 }
