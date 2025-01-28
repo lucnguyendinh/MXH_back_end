@@ -9,5 +9,4 @@ router.get('/searchbyname', adminController.SearchByName)
 router.get('/searchbyid', adminController.SearchById)
 router.get('/history', adminController.History)
 router.post('/login', adminController.Login)
-
 module.exports = router
